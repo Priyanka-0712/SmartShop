@@ -236,6 +236,7 @@ public class Users {
 			}
 		
 //============== checking valid 10 digit mobile number ======================
+		
 		public boolean validateMobile(String mobile)
 		{
 			for(int i=0;i<mobile.length();i++)
@@ -255,6 +256,7 @@ public class Users {
 		}
 		
 //============== checking valid email id =====================================
+		
 		public boolean validateEmail(String email)
 		{
 			if(email.contains("@")&&(email.endsWith(".com")))
@@ -264,6 +266,7 @@ public class Users {
 		}
 		
 //============== checking role is user or admin only ==========================
+		
 		public boolean validateRole(String role)
 		{
 			if(role.equals("admin")||role.equals("user"))
