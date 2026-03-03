@@ -1,4 +1,4 @@
-package com.connections;
+package com.connection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,14 +6,15 @@ import java.sql.SQLException;
 
 public class TestConnection {
 
-//=============== Declaring and Initializing Variables ===================================
+//============== Declaring And Initializing Variables ========================
+	
 	private static final String DB_DRIVER_CLASS="com.mysql.cj.jdbc.Driver";
 	private static final String DB_URL="jdbc:mysql://localhost:3306/myshop";
 	private static final String DB_USER_NAME="root";
 	private static final String DB_USER_PASSWORD="root";
-
-//=================== Getting Connection Object ===========================================
-
+	
+//============= Getting Connection ===========================================		
+	
 	public static Connection getConnection() throws SQLException
 	{
 		Connection connection=null;
@@ -27,5 +28,5 @@ public class TestConnection {
 		
 		return connection;
 	}
-//=========================== End ========================================================
+//========================================= End =========================================================================
 }
