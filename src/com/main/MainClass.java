@@ -3,11 +3,16 @@ package com.main;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.products.Products;
+import com.users.Users;
+
 public class MainClass {
 
 	public static void main(String[] args) throws SQLException {
 		Scanner scanner=new Scanner(System.in);
 		int input =0;
+		Users users=new Users();
+		Products products=new Products();
 	do
 	{
 		System.out.println("===========================================");
@@ -18,7 +23,7 @@ public class MainClass {
 		System.out.println(" 2. Login");
 		System.out.println(" 3. View Products ");
 		System.out.println(" 4. Search Product ");
-		System.out.println(" 5. Add to Cart \r\n");
+		System.out.println(" 5. Add to Cart ");
 		System.out.println(" 6. View Cart ");
 		System.out.println(" 7. View Purchase History ");
 		System.out.println(" 8. Exit");
@@ -40,25 +45,25 @@ public class MainClass {
 		}
 		
 		switch (input) {
-		case 1: 
+		case 1: users.userRegistration();
 			break;
 			
-		case 2: 
+		case 2: users.usersLogin();
 			break;
 			
-		case 3:
+		case 3:products.viewProductsList();
 			break;
 			
-		case 4:
+		case 4:products.searchProduct();
 			break;
 			
-		case 5:
+		case 5: Users.loginFirst();
 			break;
 			
-		case 6: 
+		case 6: Users.loginFirst();
 			break;
 			
-		case 7:
+		case 7:users.getUserPurchaseHistory();
 			break;
 			
 		default:
@@ -68,4 +73,5 @@ public class MainClass {
 	}while(input!=8);
 	scanner.close();
 }
+//========================================= End =========================================================================	
 }
