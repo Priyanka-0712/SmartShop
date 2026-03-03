@@ -128,6 +128,150 @@ public class Users {
 		ResultSet resultSet=null;
 		Scanner scanner=new Scanner(System.in);
 		
+//======================= User Registration ======================================================
+		
+//=================== User Registration form ======================
+		
+		public void userRegistration() throws SQLException
+		{
+			
+			
+
+				System.out.println("Enter First Name >> ");
+				first_name=scanner.nextLine();
+				System.out.println("Enter Last Name >> ");
+				last_name=scanner.nextLine();
+				System.out.println("Enter Username >> ");
+				username=scanner.nextLine();
+				System.out.println("Enter Password >> ");
+				password=scanner.nextLine();
+				System.out.println("Enter City >> ");
+				city=scanner.nextLine();
+				System.out.println("Enter Email ID >> ");
+				email=scanner.nextLine();
+				System.out.println("Enter Mobile Number >> ");
+				mobile=scanner.nextLine();
+				System.out.println("Enter Your Role you are user or admin");
+				role=scanner.nextLine();
+				
+				try
+				{
+					connection=TestConnection.getConnection();
+					preparedStatement=connection.prepareStatement("select * from users");
+					resultSet=preparedStatement.executeQuery();
+					while(resultSet.next())
+					{
+					if(username.equals(resultSet.getString(4)))
+					try{
+						throw new MyException("Username Already Exists");
+					   }
+					catch (MyException e) {
+						System.out.println("====================================");
+						System.out.println("         "+e.getMessage());
+					}
+					}
+					
+					preparedStatement=connection.prepareStatement("insert into users(first_name,\r\n"
+						+ "last_name,username,password,city,email,mobile,role)values(?,?,?,?,?,?,?,?)");
+					preparedStatement.setString(1, first_name.trim());
+					preparedStatement.setString(2, last_name.trim());
+					preparedStatement.setString(3, username.trim());
+					preparedStatement.setString(4, password.trim());
+					preparedStatement.setString(5, city.trim());
+					preparedStatement.setString(6, email.trim());
+					preparedStatement.setString(7, mobile.trim());
+					preparedStatement.setString(8, role.toLowerCase().trim());
+				
+					try
+					{
+						try 
+						{
+							if(!validateEmail(email))
+							throw new MyException("Please Enter Valid Email id");
+							} catch (MyException e) {
+							System.out.println("====================================");
+							System.out.println("        "+e.getMessage());
+						}
+						
+						try
+						{
+							if(!validateMobile(mobile))
+							throw new MyException("Please Enter Valid 10 digit Mobile Number");
+						}
+						catch (MyException e) {
+							System.out.println("======================================");
+							System.out.println("         "+e.getMessage());
+						}
+						
+						try
+						{
+							if(!validateRole(role))
+								throw new MyException("Please Enter User or Admin Only");
+						}
+						catch (MyException e) {
+							System.out.println("====================================");
+							System.out.println("        "+e.getMessage());
+						}
+						if(mobile.length()!=10)
+						{
+							return;
+						}
+						
+						preparedStatement.executeUpdate();
+						System.out.println("========================================");
+						System.out.println("       "+"Registration Done !!!");
+						
+					}catch (Exception e) {
+						System.out.println(e.getMessage());
+					}
+				}
+				catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
+					finally {
+								connection.close();
+								preparedStatement.close();
+								resultSet.close();	
+							}
+			}
+		
+//============== checking valid 10 digit mobile number ======================
+		public boolean validateMobile(String mobile)
+		{
+			for(int i=0;i<mobile.length();i++)
+			{
+				if(!Character.isDigit(mobile.charAt(i)))
+				{
+					return false;
+				}
+					
+			}
+			if((mobile.startsWith("6")||mobile.startsWith("7")||
+				mobile.startsWith("8")||mobile.startsWith("9"))&&(mobile.length()==10))
+				return true;
+			else 
+				return false;
+			
+		}
+		
+//============== checking valid email id =====================================
+		public boolean validateEmail(String email)
+		{
+			if(email.contains("@")&&(email.endsWith(".com")))
+				return true;
+			else 
+				return false;				
+		}
+		
+//============== checking role is user or admin only ==========================
+		public boolean validateRole(String role)
+		{
+			if(role.equals("admin")||role.equals("user"))
+				return true;
+			else
+				return false;
+		}
+		
 //======================== User Login First ===========================================================
 	
 		public static void loginFirst()
