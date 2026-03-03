@@ -14,7 +14,7 @@ import com.connections.TestConnection;
 
 public class Products {
 
-//================== Declaring Variables ==========================
+//===================== Declaring Variables ============================================
 		
 		private int product_id;
 		private String product_name;
@@ -22,7 +22,7 @@ public class Products {
 		private double price;
 		private int quantity;
 
-//==================== Getters And Setters =========================== 
+//===================== Getters And Setters ============================================ 
 		
 		public int getProduct_id() {
 			return product_id;
@@ -64,7 +64,7 @@ public class Products {
 			this.quantity = quantity;
 		}
 		
-//===================== Constructors ==================================
+//======================== Constructors ================================================
 		
 		public Products()
 		{
@@ -86,7 +86,7 @@ public class Products {
 			}
 
 
-//====================== Connection Object Creation ====================
+//====================== Connection Object Creation ====================================
 	
 		Connection connection=null;
 		PreparedStatement preparedStatement=null;
@@ -94,7 +94,7 @@ public class Products {
 		CallableStatement callableStatement=null;
 		Scanner scanner=new Scanner(System.in);
 		
-//========================== Add Products ==================================
+//========================== Add Products ==============================================
 		
 		public void addProduct() throws SQLException
 		{
@@ -142,7 +142,7 @@ public class Products {
 			
 		}
 	
-//========================== View Product Stock ================================================
+//========================== View Product Stock ========================================
 
 		public void getProductStock() throws SQLException
 		{
@@ -171,7 +171,7 @@ public class Products {
 			
 		}
 		
-//============================= View Registered Users ==========================================
+//============================= View Registered Users ==================================
 		
 			public void getRegisteredUsers() throws SQLException
 			{
@@ -206,7 +206,7 @@ public class Products {
 				}
 			}
 			
-//========================== Update Product Details ===================================================================	 
+//========================== Update Product Details ====================================	 
 			
 			public void updateProductDetails() throws SQLException
 			{
@@ -281,7 +281,7 @@ public class Products {
 				
 			}
 			
-//====================== Delete Product From Inventory =========================================================
+//====================== Delete Product From Inventory ==================================
 			
 			public void deleteProduct() throws SQLException
 			{
@@ -310,4 +310,74 @@ public class Products {
 					preparedStatement.close();
 				}
 			}
+			
+//=========================== Display All Products ======================================
+			
+			public void viewProductsList () throws SQLException
+			{
+				try {
+					connection=TestConnection.getConnection();
+					callableStatement=connection.prepareCall("{CALL view_all_products}");
+					resultSet=callableStatement.executeQuery();
+					ResultSetMetaData resultSetMetaData=resultSet.getMetaData();
+					int columnCount=resultSetMetaData.getColumnCount();
+					System.out.println("=====================================================================================");
+					for(int i=1;i<=columnCount;i++)
+					{
+						System.out.print(resultSetMetaData.getColumnLabel(i)+"\t|");
+					}
+					System.out.println();
+					System.out.println("=====================================================================================");
+					while(resultSet.next())
+					{
+						System.out.println(resultSet.getInt(1)+"\t|"+resultSet.getString(2)+"\t|\r\n"
+					+resultSet.getString(3)+"\t|"+resultSet.getDouble(4)+"\t|"+resultSet.getInt(5)+"\t|");
+					}
+					System.out.println("=====================================================================================");
+				}
+				catch (Exception e) {
+						e.printStackTrace();
+					}
+				finally {
+						connection.close();
+						callableStatement.close();
+					}
+				}
+			
+//========================== Search Products by Name or Keyword ========================= 
+			
+			public void searchProduct()
+			{
+				try {
+					connection=TestConnection.getConnection();
+					preparedStatement=connection.prepareStatement("Select product_id as 'Product Id',\r\n"
+							+ "product_name as 'Product Name',description as Description ,\r\n"
+							+ "price as Price , quantity as Quantity from products where product_name like ?");
+					System.out.println("Enter product name or keyword to search >> ");
+					String search=scanner.nextLine().trim();
+					preparedStatement.setString(1, "%"+search+"%");
+					resultSet=preparedStatement.executeQuery();
+					ResultSetMetaData resultSetMetaData=resultSet.getMetaData();
+					int columnCount=resultSetMetaData.getColumnCount();
+					System.out.println("=====================================================================================");
+					for(int i=1;i<=columnCount;i++)
+					{
+						System.out.print(resultSetMetaData.getColumnLabel(i)+"\t|");
+					}
+					System.out.println();
+					System.out.println("=====================================================================================");
+					while(resultSet.next())
+					{
+						System.out.println(resultSet.getInt(1)+"\t|"+resultSet.getString(2)+"\t|\r\n"+
+					resultSet.getString(3)+"\t|"+resultSet.getDouble(4)+"\t|"+resultSet.getInt(5)+"\t|");
+					}
+					System.out.println("=====================================================================================");
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+//========================================= End =========================================
 }

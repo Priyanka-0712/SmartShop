@@ -14,7 +14,7 @@ import com.users.Users;
 
 public class Purchases {
 
-//================== Declaring Variables =======================================================
+//========================== Declaring Variables ========================================
 	
 		private int purchase_id;
 		private double price_at_purchase;
@@ -23,7 +23,7 @@ public class Purchases {
 		private Products product;
 		Date purchase_date;
 		
-//========================= Getters and Setters ============================================================
+//========================= Getters and Setters =========================================
 		
 		public Date getPurchase_date() {
 			return purchase_date;
@@ -63,7 +63,7 @@ public class Purchases {
 			this.product = product;
 		}
 		
-//======================== Constructors ================================================
+//======================== Constructors =================================================
 		
 		public Purchases()
 		{
@@ -82,14 +82,14 @@ public class Purchases {
 		}
 
 		
-//============== creating connection objects ===========================================
+//================== creating connection objects ========================================
 		
 		Connection connection=null;
 		PreparedStatement preparedStatement=null;
 		ResultSet resultSet=null;
 		Scanner scanner=new Scanner(System.in);
 		
-//============== view user purchase history =============================================
+//=================== view user purchase history ========================================
 		
 		public void userPurchaseHistory() throws SQLException
 		{

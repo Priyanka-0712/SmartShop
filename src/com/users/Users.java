@@ -6,14 +6,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import com.admin.Admin;
 import com.connections.TestConnection;
 import com.customexception.MyException;
+import com.products.Products;
 
 public class Users {
 
-//====================== Declaring Variables ========================
+//======================== Declaring Variables =========================================
 	
 		private int user_id;
 		private String first_name;
@@ -25,7 +29,7 @@ public class Users {
 		private String mobile;
 		private String role;
 
-//========================= Constructors ==============================
+//========================= Constructors ===============================================
 
 		public Users()
 		{
@@ -46,7 +50,7 @@ public class Users {
 			this.role = role;
 		}
 		
-//===================== Getters Setters ==================================
+//====================== Getters Setters ===============================================
 
 		public int getUser_id() {
 			return user_id;
@@ -120,7 +124,7 @@ public class Users {
 			this.role = role;
 		}
 		
-//======================= Connection Object Creation ======================================================
+//======================= Connection Object Creation ====================================
 
 		Connection connection=null;
 		PreparedStatement preparedStatement=null;
@@ -128,15 +132,13 @@ public class Users {
 		ResultSet resultSet=null;
 		Scanner scanner=new Scanner(System.in);
 		
-//======================= User Registration ======================================================
+//======================= User Registration =============================================
 		
-//=================== User Registration form ======================
+//===================== User Registration form ==========================================
 		
 		public void userRegistration() throws SQLException
 		{
 			
-			
-
 				System.out.println("Enter First Name >> ");
 				first_name=scanner.nextLine();
 				System.out.println("Enter Last Name >> ");
@@ -235,7 +237,7 @@ public class Users {
 							}
 			}
 		
-//============== checking valid 10 digit mobile number ======================
+//================ checking valid 10 digit mobile number ===============================
 		
 		public boolean validateMobile(String mobile)
 		{
@@ -255,7 +257,7 @@ public class Users {
 			
 		}
 		
-//============== checking valid email id =====================================
+//========================= checking valid email id =====================================
 		
 		public boolean validateEmail(String email)
 		{
@@ -265,7 +267,7 @@ public class Users {
 				return false;				
 		}
 		
-//============== checking role is user or admin only ==========================
+//================= checking role is user or admin only =================================
 		
 		public boolean validateRole(String role)
 		{
@@ -275,7 +277,160 @@ public class Users {
 				return false;
 		}
 		
-//======================== User Login First ===========================================================
+//=========================== User Login ================================================
+		
+		public void usersLogin() throws SQLException
+		{
+			connection=TestConnection.getConnection();
+			preparedStatement=connection.prepareStatement("select * from users"
+					+ " where username=? and password=?");
+			int i=3;
+			while(i!=0)
+			{
+			System.out.println("Enter Your Username ");
+			username=scanner.nextLine();
+			System.out.println("Enter Your Password");
+			password=scanner.nextLine();
+			preparedStatement.setString(1, username);
+			preparedStatement.setString(2, password);
+			resultSet=preparedStatement.executeQuery();
+			{
+				if(resultSet.next())
+			{
+					
+				if(username.equals(resultSet.getString("username"))&&
+						password.equals(resultSet.getString("password")));
+				{
+					System.out.println("====================================================");
+					System.out.println("Login SuccessFull Welcome "+
+				resultSet.getString(2)+" "+resultSet.getString(3)+" !");
+					
+					user_id=resultSet.getInt(1);
+					role=resultSet.getString(9);
+					if(role.equals("admin"))
+					{
+						Admin admin=new Admin();
+						admin.adminOperation();
+					}
+					else if(role.equals("user"))
+					{
+						userOperation();
+					}
+				}
+				break;
+			}
+				else
+			{
+				System.out.println("=============================================");
+				System.out.println("Please Enter Correct Username or Password ");
+				if(i==0) {
+					System.out.println("Login Failed  No Attempts Left ");
+					return;
+				}
+				else if(i==1)
+				{
+					System.out.println("Last Attempt Remaining");
+				}else
+				{
+				System.out.println("Attempt Left "+i);
+				}
+				i--;
+			}
+				
+			}	
+			
+		  }
+			return;
+		}
+		
+//=======================  User Operation ===============================================
+		
+		public void userOperation() throws SQLException
+		{
+					
+			Products products=new Products();
+			products.viewProductsList();
+			connection=TestConnection.getConnection();
+			preparedStatement=connection.prepareStatement("select product_id,\r\n"
+					+ "product_name,price,quantity from products");
+			resultSet=preparedStatement.executeQuery();
+			List<Products> list=new ArrayList<Products>();
+			
+			while(resultSet.next())
+			{
+				list.add(new Products(resultSet.getInt("product_id"), resultSet.getString("product_name"), resultSet.getDouble("price"), resultSet.getInt("quantity")));
+			}
+			
+			preparedStatement.close();
+			resultSet.close();
+			
+			System.out.println("Enter the Product ID to purchase >> ");
+			int id=Integer.parseInt(scanner.nextLine().trim());
+			System.out.println("Enter the Quantity >> ");
+			int quant=Integer.parseInt(scanner.nextLine().trim());
+			System.out.println("Checking stock availability...");
+			if(quant<products.getQuantity())
+			{
+				System.out.println(" Product is not available ");
+				return;
+			}
+			System.out.println("Adding product to your cart and saving purchase in database... ");
+			preparedStatement=connection.prepareStatement("update products set quantity=quantity-? where product_id=? and quantity>=?");
+			preparedStatement.setInt(1, quant);
+			preparedStatement.setInt(2, id);
+			preparedStatement.setInt(3, quant);
+			int rows=preparedStatement.executeUpdate();
+			if(rows>0)
+			{
+				System.out.println("Stock Updates Succesfully in Inventory");
+			}
+			else
+			{
+				System.out.println("Not Enough Stock Available");
+			}
+			
+			boolean found=false;
+			List<Products> cart=new ArrayList<Products>();
+			Products selectedProduct=null;
+			for(Products p:list)
+			{
+				if(p.getProduct_id()==id)
+				{
+					selectedProduct=p;
+					break;
+				}
+			}
+			for(Products p:cart)
+			{
+				if(p.getProduct_id()==id)
+				{
+					p.setQuantity(p.getQuantity()+quant);
+					found=true;
+					break;
+				}
+			}
+			if(!found)
+			{
+				Products cartProducts=new Products(selectedProduct.getProduct_id(),selectedProduct.getProduct_name(),selectedProduct.getPrice(),quant);
+				cart.add(cartProducts);
+			}
+			double totalAmount=0;
+			System.out.printf("%-20s | %-10s | %-10s | %-10s\n","Product Name" , "Quantity" , "Price" , "Subtotal");
+			System.out.println("===================================================================================");
+			for(Products p:cart)
+			{
+				double subtotal=p.getPrice()*p.getQuantity();
+				totalAmount+=subtotal;
+				System.out.printf("%-20s | %-10d | %-10.2f | %-10.2f\n",p.getProduct_name(),p.getQuantity(),p.getPrice(),subtotal);
+			}
+			System.out.println("===================================================================================");
+			System.out.printf("  Total Amount: %10.2f\n"+totalAmount);
+			
+			connection.close();
+			preparedStatement.close();
+		}
+		
+//=========================== User Login First ==========================================
 	
 		public static void loginFirst()
 		{
@@ -289,7 +444,7 @@ public class Users {
 			}
 		}
 		
-//=======================  User Purchase History ==========================================================
+//=======================  User Purchase History ========================================
 
 		public void getUserPurchaseHistory() throws SQLException
 		{
